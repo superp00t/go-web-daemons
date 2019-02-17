@@ -1,0 +1,1 @@
+window.Webdaemon = require("./index");
