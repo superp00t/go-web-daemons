@@ -98,6 +98,10 @@ func (svc *Service) dispatchIPC(port *Port, i IPC) {
 	case "query":
 		fn, ok := svc.query.Load(i.Query)
 		if !ok {
+			port.PostMessage(IPC{
+				Type: "answer",
+				ID:   i.ID,
+			})
 			return
 		}
 

@@ -27,16 +27,17 @@ import (
 func main() {
   svc := service.New()
 
-  // Generates a UUID
-  svc.On("uuid-gen", func(q *service.Query) {
-    q.Send(etc.GenerateRandomUUID().String())
-  })
-
+  // Triggers when a JS client connects
   svc.OnPort(func(port *service.Port) {
     fmt.Println("Port opened")
   })
 
-  sv.Run()
+  // Generates a UUIDv4 string
+  svc.On("uuid-gen", func(q *service.Query) {
+    q.Send(etc.GenerateRandomUUID().String())
+  })
+
+  svc.Run()
 }
 ```
 
@@ -49,8 +50,9 @@ var service = new Webdaemon("example");
 service.on("load", onload);
 
 async function onload() {
+  // Returns UUID string in promise
   var uuid = await service.q("uuid-gen"); 
-  console.log(`Service returned ${str}`);
+  console.log(`Service returned ${uuid}`);
 }
 
 ```
