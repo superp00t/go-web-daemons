@@ -46,15 +46,11 @@ func main() {
 import Webdaemon from "go-web-daemons";
 
 var service = new Webdaemon("example");
-
 service.on("load", onload);
 
 async function onload() {
-  var str = await service.q("random", {
-    arguments: "some data you would like to add"
-  }); 
-
-  console.log(str);
+  var uuid = await service.q("uuid-gen"); 
+  console.log(`Service returned ${str}`);
 }
 
 ```

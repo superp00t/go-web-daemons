@@ -34,6 +34,7 @@ func New() *Service {
 	s := new(Service)
 	s.portsL = new(sync.Mutex)
 	s.close = make(chan bool)
+	s.query = new(sync.Map)
 	return s
 }
 
@@ -89,7 +90,7 @@ func (q *Query) Send(v interface{}) {
 }
 
 func (svc *Service) On(query string, fn func(q *Query)) {
-	svc.query.Store("query", fn)
+	svc.query.Store(query, fn)
 }
 
 func (svc *Service) dispatchIPC(port *Port, i IPC) {

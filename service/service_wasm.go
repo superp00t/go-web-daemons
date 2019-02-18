@@ -3,13 +3,15 @@
 package service
 
 import (
+	"encoding/json"
 	"fmt"
 	"syscall/js"
 )
 
 type port struct {
+	parent    *Port
+	svc       *Service
 	port      js.Value
-	recv      chan string
 	messageCb js.Callback
 	closeCb   js.Callback
 }
@@ -20,11 +22,16 @@ func (p *port) sendString(s string) {
 
 func (p *port) onMessage(j []js.Value) {
 	str := j[0].Get("data").String()
-	p.recv <- str
+	fmt.Println("got some data", str)
+
+	var i IPC
+	err := json.Unmarshal([]byte(str), &i)
+	if err == nil {
+		p.svc.dispatchIPC(p.parent, i)
+	}
 }
 
 func (p *port) onClose(j []js.Value) {
-	fmt.Println("Port closed!!!!")
 	p.messageCb.Release()
 	p.closeCb.Release()
 }
@@ -32,8 +39,6 @@ func (p *port) onClose(j []js.Value) {
 func (s *Service) onConnect(j []js.Value) {
 	p := new(port)
 	p.port = j[0].Get("ports").Index(0)
-	recv := make(chan string)
-	p.recv = recv
 
 	p.messageCb = js.NewCallback(p.onMessage)
 	p.closeCb = js.NewCallback(p.onClose)
@@ -41,7 +46,13 @@ func (s *Service) onConnect(j []js.Value) {
 	p.port.Call("addEventListener", "close", p.closeCb)
 	p.port.Call("start")
 
-	s.loadPort(&Port{p})
+	p.svc = s
+	p.parent = &Port{p}
+	s.loadPort(p.parent)
+
+	p.parent.PostMessage(IPC{
+		Type: "open",
+	})
 }
 
 func (s *Service) Run() {

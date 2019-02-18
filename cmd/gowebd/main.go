@@ -67,11 +67,20 @@ func _main(args []string) {
 }
 
 func loadWasmExec() string {
-	if os.Getenv("GOROOT") == "" {
-		yo.Fatal("you need a GOROOT to run this command")
+	c := exec.Command("go", "env", "GOROOT")
+	s, err := c.Output()
+	if err != nil {
+		yo.Fatal("error grabbing output", err)
 	}
 
-	path := etc.ParseSystemPath(os.Getenv("GOROOT")).Concat("misc", "wasm", "wasm_exec.js")
+	p := strings.TrimRight(string(s), "\r\n")
+	sprefix := etc.ParseSystemPath(p)
+	prefix := sprefix[0 : len(sprefix)-2]
+
+	vsn, _ := etc.ParseSystemPath(p).Pop()
+	yo.Ok("Go version", vsn, "detected")
+
+	path := prefix.Concat("share", vsn, "misc", "wasm", "wasm_exec.js")
 
 	b, err := ioutil.ReadFile(path.Render())
 	if err != nil {

@@ -21,10 +21,14 @@ Webdaemon.prototype.onMessage = function(event) {
       $this.query[event.id](event.data);
     }
     break;
+
+    case "open":
+    $this.emit("load");
+    break;
   }
 }
 
-Webdaemon.prototype.q = function(method, body) {
+Webdaemon.prototype.q = function(query, body) {
   const $this = this;
 
   return new Promise(function(a, rj) {
@@ -37,9 +41,10 @@ Webdaemon.prototype.q = function(method, body) {
 
     $this.conn.post({
       type: "query",
-      id:   id.toString()
-    })
-  })
+      query: query,
+      id:    id.toString()
+    });
+  });
 }
 
 module.exports = Webdaemon;
