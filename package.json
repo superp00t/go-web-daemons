@@ -1,5 +1,5 @@
 {
-  "name": "etc-js",
+  "name": "go-web-daemons",
   "version": "1.0.0",
   "description": "Golang background processing on the Web",
   "repository": {
@@ -14,11 +14,13 @@
     "build": "./node_modules/webpack/bin/webpack.js --mode production --display-modules"
   },
   "browser": {
+    "./js-lib/core/index.js": "./js-lib/core/browser.js"
   },
   "devDependencies": {
     "mocha": "^5.2.0",
     "webpack": "^4.23.1",
     "webpack-cli": "^3.1.2",
-    "webpack-node-externals": "^1.7.2"
+    "webpack-node-externals": "^1.7.2",
+    "etc-js": "git+https://github.com/superp00t/etc-js.git"
   }
 }

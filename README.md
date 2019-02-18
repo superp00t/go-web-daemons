@@ -27,7 +27,8 @@ import (
 func main() {
   svc := service.New()
 
-  svc.On("random", func(q *service.Query) {
+  // Generates a UUID
+  svc.On("uuid-gen", func(q *service.Query) {
     q.Send(etc.GenerateRandomUUID().String())
   })
 
@@ -51,7 +52,7 @@ service.on("load", onload);
 async function onload() {
   var str = await service.q("random", {
     arguments: "some data you would like to add"
-  });
+  }); 
 
   console.log(str);
 }

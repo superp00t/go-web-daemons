@@ -1,11 +1,9 @@
-
 function WebdaemonBrowser(webd, onmessage) {
-  var $this = this;
   this.sw = new SharedWorker(file + "-sharedworker.js");
-  sw.port.addEventListener("message", onmessage);
+  this.sw.port.addEventListener("message", onmessage);
 
   window.addEventListener("beforeunload", function() {
-    sw.port.postMessage({
+    this.sw.port.postMessage({
       type: "decommission"
     });
   });
@@ -14,7 +12,7 @@ function WebdaemonBrowser(webd, onmessage) {
 }
 
 WebdaemonBrowser.prototype.post = function(msg) {
-  this.sw.postMessage(msg);
+  this.sw.port.postMessage(msg);
 }
 
 module.exports = WebdaemonBrowser;
