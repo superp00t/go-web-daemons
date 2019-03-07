@@ -1,3 +1,11 @@
 package db
 
-// func Open()
+import "reflect"
+
+func Open(path string) *Conn {
+	return open(path)
+}
+
+func structName(v interface{}) string {
+	return reflect.TypeOf(v).Name()
+}

@@ -3,7 +3,6 @@
 package ws
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/gorilla/websocket"
@@ -21,9 +20,9 @@ func (c *conn) Close() error {
 }
 
 func (c *conn) Send(b []byte) error {
-	defer c.l.Unlock()
 	c.l.Lock()
 	err := c.conn.WriteMessage(c.mtype, []byte(b))
+	c.l.Unlock()
 	return err
 }
 
@@ -41,7 +40,6 @@ func dialOpts(d Opts) (*conn, error) {
 	var dialer = websocket.DefaultDialer
 
 	if d.Socks5 != "" {
-		fmt.Println("Connecting with proxy", d.Socks5)
 		netDialer, err := proxy.SOCKS5("tcp", d.Socks5, nil, proxy.Direct)
 		if err != nil {
 			return nil, err
@@ -52,6 +50,11 @@ func dialOpts(d Opts) (*conn, error) {
 	ws, _, err := dialer.Dial(url, d.Header())
 	if err != nil {
 		return nil, err
+	}
+
+	c.mtype = websocket.TextMessage
+	if d.Binary {
+		c.mtype = websocket.BinaryMessage
 	}
 
 	c.conn = ws
